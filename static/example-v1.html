@@ -1,0 +1,76 @@
+```html
+<h1>How to identify, instantiate, and evaluate domain-specific design principles for creating more effective visualizations.</h1>
+
+<p><strong>BY MANEEH AGRAWALA, WILMOT LI, AND FLORAINE BERTHOUZOZ</strong></p>
+
+<h2>Design Principles for Visual Communication</h2>
+
+<p>Visual communication via diagrams, sketches, charts, photographs, video, and animation is fundamental to the process of exploring concepts and disseminating information. The most-effective visualizations capitalize on the human facility for processing visual information, thereby improving comprehension, memory, and inference. Such visualizations help analysts quickly find patterns lurking within large data sets and help audiences quickly understand complex ideas.</p>
+
+<p>Over the past two decades a number of books have collected examples of effective visual displays. One thing is evident from inspecting them: the best are carefully crafted by skilled human designers. Yet even with the aid of computers, hand-designing effective visualizations is time-consuming and requires considerable effort. Moreover, the rate at which people worldwide generate new data is growing exponentially year over year. Gantz et al. estimated we collectively produced 161 exabytes of new information in 2006, and the compound growth rate between 2007 and 2011 would be 60% annually. We are thus expected to produce 1,800 exabytes of information in 2011, 10 times more than the amount we produced in 2006. Yet acquiring and storing this data is, by itself, of little value. We must understand it to produce real value and use it to make decisions.</p>
+
+<p>The problem is that human designers lack the time to hand-design effective visualizations for this wealth of data. Too often, data is either poorly visualized or not visualized at all. Either way, the results can be catastrophic; for example, Tufte explained how Morton Thiokol engineers failed to visually communicate the risks of launching the Challenger Space Shuttle to NASA management in 1986, leading to the vehicle's disastrous failure. While Robinson et al. argued the engineers must not be blamed for the Challenger accident, better communication of the risks might have prevented the disaster.</p>
+
+<p>Skilled visual designers manipulate the perception, cognition, and</p>
+
+<h2>Key Insights</h2>
+<ul>
+    <li><em>Design principles connect the visual design of a visualization with the viewer's perception and cognition of the underlying information the visualization is meant to convey.</em></li>
+    <li><em>Identifying and formulating design principles often requires analyzing the best hand-designed visualizations, examining the design of visualizations, and, when necessary, conducting user studies into how such techniques affect perception and cognition.</em></li>
+    <li><em>Given a set of design rules and quantitative evaluation criteria, we can use procedural techniques and energy optimization to build automated visualization-design systems.</em></li>
+</ul>
+
+<h1>Exploded View of a Smartphone</h1>
+<ol>
+    <li><strong>Screen</strong></li>
+    <li><strong>Front Camera</strong></li>
+    <li><strong>Microphone</strong></li>
+    <li><strong>Speaker</strong></li>
+    <li><strong>Display</strong></li>
+    <li><strong>Rear Camera</strong></li>
+    <li><strong>Battery</strong></li>
+    <li><strong>Mainboard</strong></li>
+    <li><strong>SIM Card Tray</strong></li>
+    <li><strong>Charging Port</strong></li>
+    <li><strong>Speaker</strong></li>
+    <li><strong>Vibration Motor</strong></li>
+    <li><strong>Housing</strong></li>
+    <li><strong>World Map</strong></li>
+    <li><strong>Back Cover</strong></li>
+    <li><strong>Base</strong></li>
+    <li><strong>Volume Buttons</strong></li>
+    <li><strong>Flash</strong></li>
+</ol>
+
+<h1>Contributed Articles</h1>
+
+<h2>Figure 1.</h2>
+<p>Harry Beck's map of the London Underground from 1933. Beck straightened the lines and more evenly spaced the stops to visually emphasize the sequence of stops along each line.</p>
+
+<p>The communicative intent of visualizations by carefully applying principles of good design. These principles explain how visual techniques can be used to either emphasize important information or de-emphasize irrelevant details; for example, the most important information in a subway map is the sequence of stops along each line and the transfer stops that allow riders to change lines. Most subway passengers do not need to know the true geographic path of each line. Based on this insight, map designer Harry Beck redesigned the map of the London Underground in 1933 using two main principles: straightening the subway lines and evenly spacing the stops to visually emphasize the sequence of stops and transfer points (see Figure 1).</p>
+
+<p>Such design principles connect the visual design of a visualization with the viewer’s perception and cognition of the underlying information the visualization is meant to convey. In the field of design, there is a long-standing debate regarding the interaction of aesthetic and functional properties of designed artifacts. We do not seek to engage in this debate here; rather, we focus on how particular design choices affect the perception and cognition of the visualization, not the aesthetic style of the visualization. Accordingly, we use the term “design principle” as a shorthand for guidelines that help improve viewers’ comprehension of visually encoded information.</p>
+
+<p>Design principles are usually not strict rules, but rules of thumb that might overlap, interpose and contradict one another. For instance, Beck did not completely straighten the subway lines; he included a few turns in them to give viewers a sense of a line’s overall spatial layout. Skilled visual designers implicitly apply the relevant design principles and balance the trade-offs between them in an iterative process of creating example designs, critiquing the examples, and improving the designs based on the critiques. Designers usually do not directly apply an explicitly defined set of design principles. The principles are a form of tacit knowledge that designers learn by creating and studying examples. It is far more common for books on visual design to contain visual examples rather than explicit design principles.</p>
+
+<p>Many of the analysts and end users inundated with data and charged with creating visualizations are not trained designers. Thus, our work aims to identify domain-specific design principles, instantiating them within automated visualization design systems that enable non-designers to create effective visual displays. While other researchers have considered specific ways to use cognitive design principles to generate visualizations (see the online appendix), we have been developing a general, three-stage approach to creating visualization design systems:</p>
+
+<h2>Figure 2.</h2>
+<p>Hand-designed cutoff and exploded-view illustrations (left) design the cuts and explosions to emphasize the shape of the missing geometry and spatial relationships among parts. Our system incorporates such principles to generate interactive cutaway and exploded-view illustrations (middle, right).</p>
+
+<h3>Stage 1. Identify design principles.</h3>
+<p>We identify domain-specific design principles by analyzing the best hand-designed visualizations within a particular information domain. We connect this analysis with research on perception and cognition of visualizations;</p>
+
+<h3>Stage 2. Instantiate design principles.</h3>
+<p>We encode the design principles into algorithms and interfaces for creating visualizations; and</p>
+
+<h3>Stage 3. Evaluate design principles.</h3>
+<p>We measure improvements in information processing, communication, and decision making that result from our visualizations. These evaluations also serve to validate the design principles.</p>
+
+<p>We have used this three-stage approach to build automated visualization design systems in two domains: cartographic visualization and technical illustration. In the domain of cartographic visualizations, we have developed automated algorithms for creating route maps and tourist maps of cities. In the domain of technical illustration, we have developed automated techniques for generating assembly instructions of furniture and toys and for creating interactive cutaway and exploded-view illustrations of complex mechanical, mathematical, and biological objects. Here, we focus on articulating the techniques we have used to identify and evaluate the design principles for each domain. These techniques generalize to other domains, and applying our three-stage approach will result in a better understanding of the strategies people use to make inferences from visualizations.</p>
+
+<h3>Hand-designed visualizations.</h3>
+<p>We have found that a useful first step in identifying design principles is to analyze examples of the best visualizations in the domain. This analysis is designed to find similarities and recurring patterns in the kinds of information the visualizations highlight, as well as the techniques used to emphasize the information.</p>
+
+<p>Consider the problem of depicting the internal structure of complex mechanical, mathematical, anatomical, and architectural objects. Illustrations often use cutaways and exploded views to reveal such structure. They carefully choose the size and shape of cuts, as well as the placement of the parts next to one another, to expose the internal structure and spatial relationships between parts. We have analyzed a large corpus of cutaways and exploded views to identify the principles and conventions expert illustrators commonly use to generate these images.</p>
+```

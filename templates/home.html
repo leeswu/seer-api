@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+      <a href="{{ url_for('example_v1') }}">Example Output: Version 1</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+      <h1>Accessible PDF Converter</h1>
+      
+      <!-- Flash Messages -->
+      <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <!-- Upload Form -->
+      <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group">{{ form.file.label() }} {{ form.file() }}</div>
+        <div class="form-group">{{ form.submit() }}</div>
+      </form>
+    </div>
+
+  </body>
+</html>
