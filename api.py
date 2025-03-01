@@ -23,6 +23,7 @@ def home():
 # Handle the upload and conversion of the uploaded PDF file
 @app.route("/upload", methods=["POST"])
 def upload():
+    # TODO: programatically set up directories
     OUT_DIR = "processed/html"
     html_doc = None
     form = UploadForm()
