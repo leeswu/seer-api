@@ -10,6 +10,8 @@ app = Flask(__name__)
 
 # CSRF protection token
 app.config['SECRET_KEY'] = 'f1cacf64ffc7cb8983e52ba34cd39b09'
+app.config['PORT'] = 8000 or os.getenv('PORT')
+
 dotenv.load_dotenv()
 
 
@@ -76,4 +78,4 @@ def example():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=os.getenv('PORT'))
+    app.run(debug=True, port=app.config['PORT'])
