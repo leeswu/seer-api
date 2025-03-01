@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # CSRF protection token
 app.config['SECRET_KEY'] = 'f1cacf64ffc7cb8983e52ba34cd39b09'
-app.config['PORT'] = 8000 or os.getenv('PORT')
+app.config['PORT'] = 8000
 
 dotenv.load_dotenv()
 
@@ -65,7 +65,6 @@ def upload():
 def processed():
     # TODO: Incorporate the html doc into the processed.html template
     html_doc = request.args.get('html_doc')
-    html_doc = None
     if html_doc is None:
         return "No HTML generated."
     return html_doc
@@ -74,7 +73,6 @@ def processed():
 @app.route("/example", methods=["GET"])
 def example():
     return redirect(url_for('static', filename='/viscomm-short.pdf-1740793822.html'))
-
 
 
 if __name__ == '__main__':
