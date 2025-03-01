@@ -4,23 +4,27 @@ import tempfile
 from gptProcessor import GPTProcessor
 import dotenv
 import os
+import time
 
 app = Flask(__name__)
 
+# CSRF protection token
 app.config['SECRET_KEY'] = 'f1cacf64ffc7cb8983e52ba34cd39b09'
 dotenv.load_dotenv()
+
 
 @app.route("/", methods=["GET"])
 def home():
     form = UploadForm()
     return render_template("home.html", form=form)
 
+# Handle the upload and conversion of the uploaded PDF file
 @app.route("/upload", methods=["POST"])
 def upload():
-    transcript = None
-    
-    # set up form for file upload
+    OUT_DIR = "processed/html"
+    html_doc = None
     form = UploadForm()
+
 
     if form.validate_on_submit():
         file = form.file.data
@@ -28,17 +32,23 @@ def upload():
             file.save(tmp_file.name)
             
             gpt = GPTProcessor(os.getenv('OPENAI_API_KEY'))
-            gpt.get_pages(tmp_file.name)
-            
-            alt_text = gpt.get_alt_text()
-            
-            print(alt_text)
-            raw_transcript = gpt.get_raw_transcript()
-            transcript = gpt.get_structured_transcript(raw_transcript, alt_text)
-            
-            # save transcript to file
-            with open("static/example-v2.html", "w") as f:
-                f.write(transcript) 
+
+            # Get each page as a base64 encoded image
+            pages = gpt.get_pages(tmp_file.name)
+
+            # Get alt text for each page    
+            alt_text = gpt.get_alt_text(pages)
+
+            # Get raw transcription for each page
+            raw_transcription = gpt.get_raw_transcription(pages)
+
+            # Structure the transcription into a HTML document
+            html_doc = gpt.get_structured_transcription(raw_transcription, alt_text)
+
+            # save html doc to file
+            OUT_FILENAME = f"{form.file.data.filename}-{int(time.time())}.html"
+            with open(os.path.join(OUT_DIR, OUT_FILENAME), "w") as f:
+                f.write(html_doc) 
                     
         # file is cleaned up upon close
         tmp_file.close()
@@ -46,59 +56,24 @@ def upload():
         flash("File uploaded successfully.", "success")
     else:
         flash("Invalid file. Please upload a PDF file.", "error")
-    return redirect(url_for('processed', transcript=transcript))
+    return redirect(url_for('processed', html_doc=html_doc))
 
+# Display the converted HTML document
 @app.route("/processed", methods=["GET"])
 def processed():
-    transcript = request.args.get('transcript')
-    # Initialize chat history if it doesn't exist
-    if 'chat_history' not in session:
-        session['chat_history'] = []
-    return render_template('processed.html', 
-                         transcript=transcript, 
-                         chat_history=session['chat_history'])
+    # TODO: Incorporate the html doc into the processed.html template
+    html_doc = request.args.get('html_doc')
+    html_doc = None
+    if html_doc is None:
+        return "No HTML generated."
+    return html_doc
 
-@app.route("/example-v1", methods=["GET"])
-def example_v1():
-    return redirect(url_for('static', filename='example-v1.html'))
 
-@app.route("/about")
-def about():
-    return "<p>About me</p>"
+@app.route("/example", methods=["GET"])
+def example():
+    return redirect(url_for('static', filename='/viscomm-short.pdf-1740793822.html'))
 
-@app.route("/ask", methods=["POST"])
-def ask_question():
-    question = request.form.get('question')
-    if not question:
-        flash("Please enter a question", "error")
-        return redirect(url_for('processed'))
 
-    # Add user question to chat history
-    if 'chat_history' not in session:
-        session['chat_history'] = []
-    
-    session['chat_history'].append({
-        'role': 'user',
-        'content': question
-    })
-
-    try:
-        # Use GPTProcessor to get response
-        gpt = GPTProcessor(os.getenv('OPENAI_API_KEY'))
-        response = gpt.ask_about_content(question)
-        
-        # Add assistant response to chat history
-        session['chat_history'].append({
-            'role': 'assistant',
-            'content': response
-        })
-        session.modified = True
-
-    except Exception as e:
-        flash("Error processing your question. Please try again.", "error")
-        print(f"Error: {str(e)}")
-
-    return redirect(url_for('processed'))
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    app.run(debug=True, port=os.getenv('PORT'))

@@ -7,15 +7,17 @@ from os import path
 class GPTProcessor:
     def __init__(self, api_key):
         self.client = OpenAI(api_key=api_key)
-        self.base64_pages = []
-        self.base64_images = []
+        self.model = "gpt-4o-mini"
 
         self.base_dir = "processed"
         self.images_path = path.join(self.base_dir, "images")
 
+
+    # Get each pages as a base64 encoded images
     def get_pages(self, file_path):
         print("Starting page extraction...")
         doc = pymupdf.open(file_path)
+        base64_pages = []
 
         for page in (doc):
             pix = page.get_pixmap()  # render page to an image
@@ -23,11 +25,13 @@ class GPTProcessor:
 
             img_base64 = base64.b64encode(img_bytes).decode("utf-8")
 
-            self.base64_pages.append(img_base64)
+            base64_pages.append(img_base64)
         print("Page extraction complete.")
+        return base64_pages
+    
 
-    def get_alt_text(self):
-        print("Starting transcript generation...")
+    def get_alt_text(self, pages):
+        print("Starting alt text generation...")
 
         SYSTEM_PROMPT = """
         You are a helpful assistant that generates highly detailed and descriptive alt text for images.
@@ -46,15 +50,11 @@ class GPTProcessor:
         Do not include any other text than the list of key-value pairs.
         """
 
-        if len(self.base64_pages) == 0:
-            print("No images found.")
-            return None
-
         try:
             alt_text = []
-            for i, page in enumerate(self.base64_pages):
+            for i, page in enumerate(pages):
                 response = self.client.chat.completions.create(
-                    model="gpt-4o-mini",
+                    model=self.model,
                     messages=[
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {"role": "user", "content": [{"type": "text", "text": USER_PROMPT}, {
@@ -86,7 +86,7 @@ class GPTProcessor:
                 img_base64 = base64.b64encode(img_bytes).decode("utf-8")
                 self.base64_images.append(img_base64)
 
-    def get_raw_transcript(self):
+    def get_raw_transcription(self, pages):
         print("Starting transcript generation...")
 
         SYSTEM_PROMPT = """
@@ -110,15 +110,11 @@ class GPTProcessor:
         Return no other text than the transcript.
         """
 
-        if len(self.base64_pages) == 0:
-            print("No images found.")
-            return None
-
         try:
             transcript = ""
-            for i, page in enumerate(self.base64_pages):
+            for i, page in enumerate(pages):
                 response = self.client.chat.completions.create(
-                    model="gpt-4o-mini",
+                    model=self.model,
                     messages=[
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {"role": "user", "content": [{"type": "text", "text": USER_PROMPT}, {
@@ -128,11 +124,11 @@ class GPTProcessor:
                 print(f"Finished transcribing page {i+1}")
                 transcript += response.choices[0].message.content
         except Exception as e:
-            print(f"Error generating transcript: {e}")
+            print(f"Error generating raw transcription: {e}")
             return None
         return transcript
 
-    def get_structured_transcript(self, raw_transcript, alt_text):
+    def get_structured_transcription(self, raw_transcription, alt_text):
         print("Starting transcript structuring...")
 
         SYSTEM_PROMPT = """
@@ -149,12 +145,12 @@ class GPTProcessor:
         {alt_text}
 
         Here is the markdown transcript:
-        {raw_transcript}
+        {raw_transcription}
         """
 
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=self.model,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": [{"type": "text", "text": USER_PROMPT}]}
@@ -162,18 +158,6 @@ class GPTProcessor:
             )
             structured_transcript = response.choices[0].message.content.replace("```html", "").replace("```", "")
         except Exception as e:
-            print(f"Error generating transcript: {e}")
+            print(f"Error generating structured transcription  : {e}")
             return None
         return structured_transcript
-
-    def ask_about_content(self, question):
-        # Assuming you have stored the content somewhere accessible
-        # You might want to store it in a session or pass it along
-        response = self.client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant answering questions about a PDF document's content."},
-                {"role": "user", "content": question}
-            ]
-        )
-        return response.choices[0].message.content

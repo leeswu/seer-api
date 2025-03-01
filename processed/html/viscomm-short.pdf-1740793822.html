@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to identify, instantiate, and evaluate domain-specific design principles for creating more effective visualizations</title>
+</head>
+
+<body>
+    <h1>How to identify, instantiate, and evaluate domain-specific design principles for creating more effective visualizations.</h1>
+
+    <strong>BY MANEESH AGRAWALA, WILMOT LI, AND FLORAINE BERTHOUZOZ</strong>
+
+    <h2>Design Principles for Visual Communication</h2>
+
+    <h3>Visual Communication</h3>
+
+    <p>Visual communication via diagrams, sketches, charts, photographs, video, and animation is fundamental to the process of exploring concepts and disseminating information. The most effective visualizations capitalize on the human facility for processing visual information, thereby improving comprehension, memory, and inference. Such visualizations help analysts quickly find patterns lurking within large data sets and help audiences quickly understand complex ideas.</p>
+
+    <p>Over the past two decades a number of books have collected examples of effective visual displays. One thing is evident from inspecting them: the best are carefully crafted by skilled human designers. Yet even with the aid of computers, hand-designing effective visualizations is time-consuming and requires considerable effort. Moreover, the rate at which people worldwide generate new data is growing exponentially year over year. Gantz et al. estimated we collectively produced 161 exabytes of new information in 2006, and the compound growth rate between 2007 and 2011 would be 60% annually. We are thus expected to produce 1,800 exabytes of information in 2011, 10 times more than the amount we produced in 2006. Yet acquiring and storing this data is, by itself, of little value. We must understand it to produce real value and use it to make decisions.</p>
+
+    <p>The problem is that human designers lack the time to hand-design effective visualizations for this wealth of data. Too often, data is either poorly visualized or not visualized at all. Either way, the results can be catastrophic; for example, Tufte explained how Morton Thiokol engineers failed to visually communicate the risks of launching the Challenger Space Shuttle to NASA management in 1986, leading to the vehicle's disastrous failure. While Robison et al. argued the engineers must not be blamed for the Challenger accident, better communication of the risks might have prevented the disaster.</p>
+
+    <h3>Key Insights</h3>
+
+    <ul>
+        <li><strong>Design principles connect the visual design of a visualization with the viewer's perception and cognition of the underlying information the visualization is meant to convey.</strong></li>
+        <li><strong>Identifying and formulating design principles often requires analyzing the best hand-designed visualizations, examining criteria for visualization design, and, when necessary, conducting user studies into how visual techniques affect perception and cognition.</strong></li>
+        <li><strong>Given a set of design rules and quantitative evaluation criteria, we can use procedural techniques and energy optimization to build automated visualization-design systems.</strong></li>
+    </ul>
+
+    <h3>Exploded View of a Smartphone</h3>
+
+    <ol>
+        <li>Front Glass</li>
+        <li>Front Camera</li>
+        <li>Power Button</li>
+        <li>Rear Camera</li>
+        <li>Sensor</li>
+        <li>Microphone</li>
+        <li>Loudspeaker</li>
+        <li>Mainboard</li>
+        <li>Battery</li>
+        <li>SIM Card Tray</li>
+        <li>Rear Cover</li>
+        <li>Antenna</li>
+        <li>Vibrator</li>
+        <li>Gyroscope</li>
+        <li>Fingerprint Sensor</li>
+        <li>Micro USB Port</li>
+        <li>LCD Display</li>
+        <li>GPS Module</li>
+    </ol>
+    <p><em>Alt text: An exploded view diagram of a smartphone, displaying various internal components including the front and rear cameras, sensors, buttons, battery, and more, all labeled with numbers for easy identification. Each part is colorfully illustrated against a blue background.</em></p>
+
+    <h2>contributed articles</h2>
+
+    <p><strong>Figure 1.</strong> Harry Beck's map of the London Underground from 1933. Beck straightened the lines and more evenly spaced the stops to visually emphasize the sequence of stops along each line.</p>
+
+    <p>communicative intent of visualizations by carefully applying principles of good design. These principles explain how visual techniques can be used to either emphasize important information or de-emphasize irrelevant details; for example, the most important information in a subway map is the sequence of stops along each line and the transfer stops that allow riders to change lines. Most subway passengers do not need to know the true geographic path of each line. Based on this insight, map designer Harry Beck redesigned the map of the London Underground in 1933 using two main principles: straightening the subway lines and evenly spacing.</p>
+
+    <p><strong>Figure 2.</strong> Hand-designed cutaway and exploded-view illustrations (left) design the cuts and expansions to emphasize the shape of the missing geometry and spatial relationships among parts. Our system incorporates such principles to generate interactive cutaway and exploded-view illustrations (right).</p>
+
+    <p>the stops to visually emphasize the sequence of stops and transfer points (see Figure 1).</p>
+
+    <p>Such design principles connect the visual design of a visualization with the viewer’s perception and cognition of the underlying information the visualization is meant to convey. In the field of design, there is a long-standing debate regarding the interaction of aesthetic and functional properties of designed artifacts. We do not seek to engage in this debate here; rather, we focus on how particular design choices affect the perception and cognition of the visualization, not the aesthetic style of the visualization. Accordingly, we use the term “design principle” as a shorthand for guidelines that help improve viewers’ comprehension of visually encoded information.</p>
+
+    <p>Design principles are usually not strict rules, but rules of thumb that might even contradict one another. For instance, Beck did not completely straighten the subway lines; he included a few turns in them to give viewers a sense of a line’s overall spatial layout. Skilled visual designers implicitly apply the relevant design principles and balance the trade-offs between them in an iterative process of creating examples, critiquing the examples, and improving the designs based on the critiques. Designers usually do not directly apply an explicitly defined set of design principles. The principles are a form of tacit knowledge that designers learn by creating and studying examples. It is far more common for books on visual design to contain visual examples rather than explicit design principles.</p>
+
+    <p>Many of the analysts and end users inundated with data and charged with creating visualizations are not trained designers. Thus, our work aims to identify domain-specific design principles, instantiating them within automated visualization design systems that enable non-designers to create effective visual displays. While other researchers have considered specific ways to use cognitive design principles to generate visualizations (see the online appendix) we have been developing a general, three-stage approach to creating visualization design systems:</p>
+
+    <h2>contributed articles</h2>
+
+    <h3>Stage 1. Identify design principles.</h3>
+    <p>We identify domain-specific design principles by analyzing the best hand-designed visualizations within a particular information domain. We connect this analysis with research on perception and cognition of visualizations;</p>
+
+    <h3>Stage 2. Instantiate design principles.</h3>
+    <p>We encode the design principles into algorithms and interfaces for creating visualizations; and</p>
+
+    <h3>Stage 3. Evaluate design principles.</h3>
+    <p>We measure improvements in information processing, communication, and decision making that result from our visualizations. These evaluations also serve to validate the design principles.</p>
+
+    <p>We have used this three-stage approach to build automated visualization design systems in two domains: cartographic visualization and technical illustration. In the domain of cartographic visualizations we have developed automated algorithms for creating route maps and tourist maps of cities. In the domain of technical illustration we have developed automated techniques for generating assembly instructions of furniture and toys and for creating interactive cutaway and exploded-view illustrations of complex mechanical, mathematical, and biological objects. Here, we focus on articulating the techniques we have used to identify and evaluate the design principles for each domain. These techniques generalize to other domains, and applying our three-stage approach will result in a better understanding of the strategies people use to make inferences from visualizations.</p>
+
+    <h3>Figure 3.</h3>
+    <p>Exploded views of complex mathematical surfaces are designed to reveal formal geo-metric features (such as symmetry, self-intersections, and critical points).</p>
+    <p><em>Alt text: A series of exploded view illustrations showcasing complex mathematical surfaces, highlighting features such as symmetry and self-intersections.</em></p>
+
+    <h3>Stage 1: Identify Design Principles</h3>
+    <p>Design principles are prescriptive rules describing how visual techniques affect the perception and cognition of the information in a display. In some cases, they are explicitly outlined in books; for example, books on photography techniques explain the rules for composing images of people just below the shoulders or near the waist, rather than at the neck or the knees. Researchers have directly applied them to build a variety of automated photo-manipulation algorithms (see the online appendix for examples).</p>
+
+    <p>However, our experience is that design principles are rarely stated so explicitly. Thus, we have developed three strategies for extracting and informing domain-specific design principles: (1) analyze the best hand-designed visualizations in the domain, (2) perform user research on the perception and cognition of visualizations, and, when necessary, (3) conduct new user studies that investigate how visual techniques affect perception and cognition.</p>
+
+    <h3>Hand-designed visualizations</h3>
+    <p>We have found that a useful first step in identifying design principles is to analyze examples of the best visualizations in the domain. This analysis is designed to find similarities and recurring patterns in the kinds of information the visualizations highlight, as well as the techniques used to emphasize the information.</p>
+
+    <p>Consider the problem of depicting the internal structure of complex mechanical, mathematical, anatomical, and architectural objects. Illustrators often use cutaways and exploded views to reveal such structure. They carefully choose the size and shape of cuts, as well as the placement of the parts next to one another, to expose the internal structure and spatial relationships between parts. We have analyzed a large corpus of cutaways and exploded views to identify the principles and conventions expert illustrators commonly use to generate these images.</p>
+
+    <h3>Figure 4.</h3>
+    <p>Hand-designed "how things work" illustrations (a) use motion arrows and frame sequences to convey the motion and interactions of the parts within a mechanical assembly. Our system analyzes a geometric model (b) of a mechanical system to infer the motion and interactions of the parts, then generates the motion arrows and frame sequences (c–d) necessary to depict how the assembly works.</p>
+    <p><em>Alt text: Series of illustrations showing the motion and interaction of parts in a mechanical assembly, starting with a geometric model, leading to motion representation, and concluding with frame sequences illustrating each step.</em></p>
+
+</body>
+
+</html>
