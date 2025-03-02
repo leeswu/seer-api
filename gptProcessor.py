@@ -134,7 +134,7 @@ class GPTProcessor:
         SYSTEM_PROMPT = """
         You are a helpful assistant that can accurately and precisely convert and restructure markdown into properly formatted HTML.
         Given a a markdown transcript and a list of alt text descriptions for images, inject the alt text descriptions into the right places and return a properly formatted HTML document that maintains the original heading, hierarchy, and captions.
-        Do not include any image links, filepaths, or source information in the HTML.
+        Remove any actual image links, filepaths, or source information in the HTML.
         Return no other text than the HTML.
         """
 

@@ -24,10 +24,12 @@ def home():
 @app.route("/upload", methods=["POST"])
 def upload():
     # TODO: programatically set up directories
-    OUT_DIR = "processed/html"
+    HTML_DIR = "processed/html"
+    MD_DIR = "processed/md" 
+
+
     html_doc = None
     form = UploadForm()
-
 
     if form.validate_on_submit():
         file = form.file.data
@@ -48,11 +50,22 @@ def upload():
             # Structure the transcription into a HTML document
             html_doc = gpt.get_structured_transcription(raw_transcription, alt_text)
 
-            # save html doc to file
-            OUT_FILENAME = f"{form.file.data.filename}-{int(time.time())}.html"
-            with open(os.path.join(OUT_DIR, OUT_FILENAME), "w") as f:
-                f.write(html_doc) 
-                    
+            try:
+            # save md doc to file
+                MD_FILENAME = f"{form.file.data.filename}-{int(time.time())}.md"
+                with open(os.path.join(MD_DIR, MD_FILENAME), "w", encoding="utf-8") as f:
+                    f.write(raw_transcription) 
+            except Exception as e:
+                print(f"Error saving MD file: {e}")
+
+            try:
+                # save html doc to file
+                HTML_FILENAME = f"{form.file.data.filename}-{int(time.time())}.html"
+                with open(os.path.join(HTML_DIR, HTML_FILENAME), "w", encoding="utf-8") as f:
+                    f.write(html_doc) 
+            except Exception as e:
+                print(f"Error saving HTML file: {e}")
+
         # file is cleaned up upon close
         tmp_file.close()
         
