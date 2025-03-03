@@ -26,6 +26,7 @@ def home():
 @app.route("/streamlit-upload", methods=["POST"])
 def streamlit_upload():
     print("upload route hit")
+    MD_DIR = "processed/md"
     if "file" not in request.files:
         return jsonify({"error": "No file field in request"}), 400
 
@@ -54,6 +55,10 @@ def streamlit_upload():
 
         # structure the transcription into a HTML document
         md_doc = gpt.get_structured_md_incremental(pages)
+
+        MD_FILENAME = f"{file.filename}-{int(time.time())}.md"
+        with open(os.path.join(MD_DIR, MD_FILENAME), "w", encoding="utf-8") as f:
+            f.write(md_doc)
     except Exception as e:
         print(f"Error converting document: {e}")
         return jsonify({"error": str(e)})

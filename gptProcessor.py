@@ -2,7 +2,7 @@ from openai import OpenAI
 import base64
 import pymupdf
 from os import path
-
+import re
 
 class GPTProcessor:
     def __init__(self, api_key):
@@ -77,34 +77,38 @@ class GPTProcessor:
         structured_pages = []
         
         # Get alt text and transcription for each page
-        alt_texts = self.get_alt_text(pages)
-        if not alt_texts:
-            return None
+        # alt_texts = self.get_alt_text(pages)
+        # if not alt_texts:
+        #     return None
             
-        page_transcripts = self.get_raw_transcription(pages)
-        if not page_transcripts:
-            return None
+        # page_transcripts = self.get_raw_transcription(pages)
+        # if not page_transcripts:
+        #     return None
 
         # Process each page individually
-        for i, (page_transcript, page_alt_text) in enumerate(zip(page_transcripts, alt_texts)):
+        for i, page in enumerate(pages):
             print(f"Structuring page {i+1}...")
+
+            page_alt_text = self.get_alt_text([page])
+            page_transcript = self.get_raw_transcription([page])
             
             SYSTEM_PROMPT = """
-            Given a markdown transcript and alt text descriptions for a single page, format the content properly while:
-            1. Maintaining proper heading hierarchy
-            2. Injecting alt text descriptions in the right places
-            3. Removing any image links or filepaths
-            4. Preserving all original text and captions
-            Return only the formatted markdown content.
+            Given a markdown transcript and a list of alt text descriptions for images, change heading and subheading levels as needed and inject the alt text descriptions into the right places to return a properly formatted, logically structured markdown document.
+            
+            Requirements:
+            1. Convert any actual references to actual images, including links, brackets, filepaths, or source information in the markdown to plain markdown.
+            2. Leave all original text and captions intact and in the same place they were in the original markdown.
+            3. Remove any and all markdown code blocks.
+            4. Return no other text than the markdown.
             """
 
             USER_PROMPT = f"""
-            Format this single page's content into proper markdown, incorporating the alt text descriptions.
-
-            Alt text descriptions:
+            Given a markdown transcript and a list of alt text descriptions for images, reformat headings and subheadings as needed and inject the alt text descriptions into the right places to return a properly formatted, logically structured markdown document.
+            
+            Here is the list of alt text descriptions for images:
             {page_alt_text}
 
-            Page transcript:
+            Here is the markdown transcript:
             {page_transcript}
             """
 
@@ -116,7 +120,8 @@ class GPTProcessor:
                         {"role": "user", "content": USER_PROMPT}
                     ]
                 )
-                structured_page = response.choices[0].message.content.replace("```md", "").replace("```", "")
+                structured_page = response.choices[0].message.content.replace("```md", "").replace("```", "").replace("markdown", "")
+                structured_page = re.sub(r"!\[(.*?)\]\(.*?\)", r"\1", structured_page)
                 structured_pages.append(structured_page)
             except Exception as e:
                 print(f"Error processing page {i+1}: {e}")
