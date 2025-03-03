@@ -71,6 +71,62 @@ class GPTProcessor:
             print(f"Error generating transcript: {e}")
             return None
         return alt_text
+    
+    def get_structured_md_incremental(self, pages):
+        print("Starting incremental processing...")
+        structured_pages = []
+        
+        # Get alt text and transcription for each page
+        alt_texts = self.get_alt_text(pages)
+        if not alt_texts:
+            return None
+            
+        page_transcripts = self.get_raw_transcription(pages)
+        if not page_transcripts:
+            return None
+
+        # Process each page individually
+        for i, (page_transcript, page_alt_text) in enumerate(zip(page_transcripts, alt_texts)):
+            print(f"Structuring page {i+1}...")
+            
+            SYSTEM_PROMPT = """
+            Given a markdown transcript and alt text descriptions for a single page, format the content properly while:
+            1. Maintaining proper heading hierarchy
+            2. Injecting alt text descriptions in the right places
+            3. Removing any image links or filepaths
+            4. Preserving all original text and captions
+            Return only the formatted markdown content.
+            """
+
+            USER_PROMPT = f"""
+            Format this single page's content into proper markdown, incorporating the alt text descriptions.
+
+            Alt text descriptions:
+            {page_alt_text}
+
+            Page transcript:
+            {page_transcript}
+            """
+
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": USER_PROMPT}
+                    ]
+                )
+                structured_page = response.choices[0].message.content.replace("```md", "").replace("```", "")
+                structured_pages.append(structured_page)
+            except Exception as e:
+                print(f"Error processing page {i+1}: {e}")
+                return None
+
+        # Combine all pages into a single markdown document
+        print("Combining pages...")
+        combined_markdown = "\n\n".join(structured_pages)
+        
+        return combined_markdown
         
 
     def get_images(self, file_path):

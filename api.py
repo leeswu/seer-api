@@ -25,9 +25,6 @@ def home():
 # Handle the upload and conversion of the uploaded PDF file
 @app.route("/streamlit-upload", methods=["POST"])
 def streamlit_upload():
-    print("upload route hit")
-    HTML_DIR = "processed/html"
-    MD_DIR = "processed/md"
 
     html_doc = None
 
@@ -57,7 +54,7 @@ def streamlit_upload():
         raw_transcription = gpt.get_raw_transcription(pages)
 
         # structure the transcription into a HTML document
-        md_doc = gpt.get_structured_md(raw_transcription, alt_text)
+        md_doc = gpt.get_structured_md_incremental(raw_transcription, alt_text)
     except Exception as e:
         print(f"Error converting document: {e}")
         return jsonify({"error": str(e)})
