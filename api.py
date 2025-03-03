@@ -20,9 +20,10 @@ def home():
     form = UploadForm()
     return render_template("home.html", form=form)
 
+
 # Handle the upload and conversion of the uploaded PDF file
-@app.route("/upload", methods=["POST"])
-def upload():
+@app.route("/streamlit-upload", methods=["POST"])
+def streamlit_upload():
     HTML_DIR = "processed/html"
     MD_DIR = "processed/md"
 
@@ -76,6 +77,63 @@ def upload():
         flash("Invalid file. Please upload a PDF file.", "error")
     
     return redirect(url_for('processed', html_doc=html_doc))
+
+# # Handle the upload and conversion of the uploaded PDF file
+# @app.route("/upload", methods=["POST"])
+# def upload():
+#     HTML_DIR = "processed/html"
+#     MD_DIR = "processed/md"
+
+#     html_doc = None
+#     form = UploadForm()
+
+#     if form.validate_on_submit():
+#         file = form.file.data
+        
+#         # store file into memory (instead of locally)
+#         file_in_memory = io.BytesIO(file.read())
+
+#         # make tmp file on disk to pass to PyMuPDF
+#         with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_file:
+#             tmp_file.write(file_in_memory.read())
+#             tmp_file_path = tmp_file.name
+
+#         # process the temporary file path using GPTProcessor
+#         gpt = GPTProcessor(os.getenv('OPENAI_API_KEY'))
+
+#         # process the file
+#         pages = gpt.get_pages(tmp_file_path)
+
+#         # get alt text for each page    
+#         alt_text = gpt.get_alt_text(pages)
+
+#         # get raw transcription for each page
+#         raw_transcription = gpt.get_raw_transcription(pages)
+
+#         # structure the transcription into a HTML document
+#         html_doc = gpt.get_structured_transcription(raw_transcription, alt_text)
+
+#         try:
+#             # save md doc to file
+#             MD_FILENAME = f"{form.file.data.filename}-{int(time.time())}.md"
+#             with open(os.path.join(MD_DIR, MD_FILENAME), "w", encoding="utf-8") as f:
+#                 f.write(raw_transcription) 
+#         except Exception as e:
+#             print(f"Error saving MD file: {e}")
+
+#         try:
+#             # save HTML doc to file
+#             HTML_FILENAME = f"{form.file.data.filename}-{int(time.time())}.html"
+#             with open(os.path.join(HTML_DIR, HTML_FILENAME), "w", encoding="utf-8") as f:
+#                 f.write(html_doc) 
+#         except Exception as e:
+#             print(f"Error saving HTML file: {e}")
+        
+#         flash("File uploaded successfully.", "success")
+#     else:
+#         flash("Invalid file. Please upload a PDF file.", "error")
+    
+#     return redirect(url_for('processed', html_doc=html_doc))
 
 # Display the converted HTML document
 @app.route("/processed", methods=["GET"])
