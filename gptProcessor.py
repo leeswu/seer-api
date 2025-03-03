@@ -122,6 +122,8 @@ class GPTProcessor:
                 )
                 structured_page = response.choices[0].message.content.replace("```md", "").replace("```", "").replace("markdown", "")
                 structured_page = re.sub(r"!\[(.*?)\]\(.*?\)", r"\1", structured_page)
+                structured_page = re.sub(r"!\[(.*?)\]\([\s\S]*?\)", r"\1", structured_page)
+
                 structured_pages.append(structured_page)
             except Exception as e:
                 print(f"Error processing page {i+1}: {e}")
@@ -161,12 +163,13 @@ class GPTProcessor:
  
 
         Requirements:
-        1. Maintain all image captions and references.
-        2. Maintain proper headings, subheadings, and hierarchies.
-        3. Do not include any footers, headers, page numbers, or other metadata.
-        4. For any images in the page, generate a detailed alt text description for someone who is blind or low vision and include it directly following the caption.
-        5. Do not include any actual image links or filepaths in the transcript.
-        6. Return no other text than the transcript.
+        1. Maintain logical reading order. If the text is in columns, transcribe the text from top to bottom, left to right in the columns. The columns may be broken by images.
+        2. Maintain all image captions and references.
+        3. Maintain proper headings, subheadings, and hierarchies.
+        4. Do not include any footers, headers, page numbers, or other metadata.
+        5. For any images in the page, generate a detailed alt text description for someone who is blind or low vision and include it directly following the caption.
+        6. Do not include any actual image links or filepaths in the transcript.
+        7. Return no other text than the transcript.
 
         """
 
