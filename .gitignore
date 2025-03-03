@@ -30,3 +30,8 @@ htmlcov/
 *.swp
 *.swo
 *~
+
+# saved intermediate files
+processed/html/*
+processed/md/*
+processed/images/*

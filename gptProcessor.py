@@ -34,20 +34,24 @@ class GPTProcessor:
         print("Starting alt text generation...")
 
         SYSTEM_PROMPT = """
-        You are a helpful assistant that generates highly detailed and descriptive alt text for images.
+        You are a helpful assistant that generates highly detailed and descriptive alt text for images and figures.
         You will be given a list of images that represent sequential pages of a document.
         Your task is to generate a detailed alt text description for each image in those pages.
         
-        You output should consist of a list of key-value pairs, where the key is the image name and the value is the alt text description.
-        Do not include any other text than the list of key-value pairs.
-        Do not include any image links or filepaths in the alt text.
+        Requirements:
+        1. You output should consist of a list of key-value pairs, where the key is the image name and the value is the alt text description.
+        2. The alt text description should be preceded by the words: "Alt text:".
+        3. Even if a figure or image has a caption, still generate an alt text description for it.
+        4. Do not include any image links or filepaths in the alt text.
+        5. Return no other text than the list of key-value pairs.
         """
 
         USER_PROMPT = """
         Generate highly detailed and descriptive alt text for all the images in this page.
         
         Return a list of key-value pairs, where the key is the image name and the value is the alt text description.
-        Do not include any other text than the list of key-value pairs.
+        The alt text description should be preceded by the words: "Alt text:".
+        Return no other text than the list of key-value pairs.
         """
 
         try:
@@ -127,8 +131,44 @@ class GPTProcessor:
             print(f"Error generating raw transcription: {e}")
             return None
         return transcript
+    
+    def get_structured_md(self, raw_transcription, alt_text):
+        print("Starting transcript structuring...")
 
-    def get_structured_transcription(self, raw_transcription, alt_text):
+        SYSTEM_PROMPT = """
+        Given a markdown transcript and a list of alt text descriptions for images, change heading and subheading levels as needed and inject the alt text descriptions into the right places to return a properly formatted, logically structured markdown document.
+        
+        Requirements:
+        1. Remove any actual image links, filepaths, or source information in the markdown.
+        2. Leave all original text and captions intact and in the same place they were in the original markdown.
+        3. Return no other text than the markdown.
+        """
+
+        USER_PROMPT = f"""
+        Given a markdown transcript and a list of alt text descriptions for images, reformat headings and subheadings as needed and inject the alt text descriptions into the right places to return a properly formatted, logically structured markdown document.
+        
+        Here is the list of alt text descriptions for images:
+        {alt_text}
+
+        Here is the markdown transcript:
+        {raw_transcription}
+        """
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": [{"type": "text", "text": USER_PROMPT}]}
+                ]
+            )
+            structured_transcript = response.choices[0].message.content.replace("```md", "").replace("```", "")
+        except Exception as e:
+            print(f"Error generating structured transcription  : {e}")
+            return None
+        return structured_transcript
+
+    def get_structured_html(self, raw_transcription, alt_text):
         print("Starting transcript structuring...")
 
         SYSTEM_PROMPT = """
