@@ -264,3 +264,31 @@ class GPTProcessor:
             print(f"Error generating structured transcription  : {e}")
             return None
         return structured_transcript
+    
+    def convert_md_to_html(self, md_text):
+        print("Starting markdown to HTML conversion...")
+
+        SYSTEM_PROMPT = """
+        You are a helpful assistant that can accurately and precisely convert and restructure markdown into properly formatted HTML.
+        """
+
+        USER_PROMPT = f"""
+        Convert the following markdown into a clean, well-structured HTML document. Maintain all original text. Alt text descriptions should be preceded by the words: "Alt text:".
+        
+        Here is the markdown transcript:
+        {md_text}
+        """
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": [{"type": "text", "text": USER_PROMPT}]}
+                ]
+            )
+            html_text = response.choices[0].message.content.replace("```html", "").replace("```", "")
+        except Exception as e:
+            print(f"Error converting markdown to HTML: {e}")
+            return None
+        return html_text

@@ -56,6 +56,8 @@ def streamlit_upload():
         # structure the transcription into a HTML document
         md_doc = gpt.get_structured_md_incremental(pages)
 
+        html_doc = gpt.convert_md_to_html(md_doc)
+
         # MD_FILENAME = f"{file.filename}-{int(time.time())}.md"
         # with open(os.path.join(MD_DIR, MD_FILENAME), "w", encoding="utf-8") as f:
         #     f.write(md_doc)
@@ -63,7 +65,7 @@ def streamlit_upload():
         print(f"Error converting document: {e}")
         return jsonify({"error": str(e)})
 
-    return jsonify({"md": md_doc, "filename": file.filename})
+    return jsonify({"md": md_doc, "html": html_doc, "filename": file.filename})
 
 # Handle the upload and conversion of the uploaded PDF file
 @app.route("/upload", methods=["POST"])
