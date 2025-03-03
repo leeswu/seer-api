@@ -25,9 +25,7 @@ def home():
 # Handle the upload and conversion of the uploaded PDF file
 @app.route("/streamlit-upload", methods=["POST"])
 def streamlit_upload():
-
-    html_doc = None
-
+    print("upload route hit")
     if "file" not in request.files:
         return jsonify({"error": "No file field in request"}), 400
 
@@ -41,20 +39,21 @@ def streamlit_upload():
         tmp_file_path = tmp_file.name
 
     try:
+        print("beginning processing")
         # process the temporary file path using GPTProcessor
         gpt = GPTProcessor(os.getenv('OPENAI_API_KEY'))
 
         # process the file
         pages = gpt.get_pages(tmp_file_path)
 
-        # get alt text for each page
-        alt_text = gpt.get_alt_text(pages)
+        # # get alt text for each page
+        # alt_text = gpt.get_alt_text(pages)
 
-        # get raw transcription for each page
-        raw_transcription = gpt.get_raw_transcription(pages)
+        # # get raw transcription for each page
+        # raw_transcription = gpt.get_raw_transcription(pages)
 
         # structure the transcription into a HTML document
-        md_doc = gpt.get_structured_md_incremental(raw_transcription, alt_text)
+        md_doc = gpt.get_structured_md_incremental(pages)
     except Exception as e:
         print(f"Error converting document: {e}")
         return jsonify({"error": str(e)})
