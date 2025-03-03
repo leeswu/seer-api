@@ -121,8 +121,7 @@ class GPTProcessor:
                     ]
                 )
                 structured_page = response.choices[0].message.content.replace("```md", "").replace("```", "").replace("markdown", "")
-                structured_page = re.sub(r"!\[(.*?)\]\(.*?\)", r"\1", structured_page)
-                structured_page = re.sub(r"!\[(.*?)\]\([\s\S]*?\)", r"\1", structured_page)
+                structured_page = re.sub(r"!\[(.*?)\]", r"\1", structured_page)
 
                 structured_pages.append(structured_page)
             except Exception as e:
