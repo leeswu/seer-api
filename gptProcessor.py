@@ -3,6 +3,7 @@ import base64
 import pymupdf
 from os import path
 import re
+import json
 
 class GPTProcessor:
     def __init__(self, api_key):
@@ -37,26 +38,37 @@ class GPTProcessor:
         You are a helpful assistant that generates highly detailed and descriptive alt text for images and figures.
         You will be given a list of images that represent sequential pages of a document.
         Your task is to generate a detailed alt text description for each image in those pages.
+        Base your output on the requirements and the example below.
         
         Requirements:
-        1. You output should consist of a list of key-value pairs, where the key is the image name and the value is the alt text description.
-        2. The alt text description should be preceded by the words: "Alt text:".
-        3. Even if a figure or image has a caption, still generate an alt text description for it.
-        4. Do not include any image links or filepaths in the alt text.
-        5. Return no other text than the list of key-value pairs.
+        1. You output should consist of a list of new line separated JSON objects, structured as follows: {"imageName": <IMAGE_NAME>, "altText": <ALT_TEXT>}
+        where the name of the image or figure should go where <IMAGE_NAME> is and the alt text should go where <ALT_TEXT> is.
+        2. Even if a figure or image has a caption, still generate an alt text description for it. Do not generate more than one alt text per image or figure.
+        3. Do not include any image links or filepaths in the alt text.
+        4. Return no other text than the list of JSON objects.
+
+        Example:
+        {"imageName": "Figure 1.", "altText": "This is the alt text for figure 1"}\n
+        {"imageName": "Figure 8.", "altText": "This is some alt text for figure 8"}\n
+        {"imageName": "Unlabeled Figure.", "altText": "This is alt text for an unlabeled figure."}
         """
 
         USER_PROMPT = """
         Generate highly detailed and descriptive alt text for all the images in this page.
         
-        Return a list of key-value pairs, where the key is the image name and the value is the alt text description.
-        The alt text description should be preceded by the words: "Alt text:".
-        Return no other text than the list of key-value pairs.
+        Return a list of new line separated JSON objects that contain alt text for each image, structured as follows: {"imageName": <IMAGE_NAME>, "altText": <ALT_TEXT>}
+        where the name of the image or figure should go where <IMAGE_NAME> is and the alt text should go where <ALT_TEXT> is.
+        Return no other text than the JSON objects.
         """
 
+
         try:
-            alt_text = []
+            alt_texts = []
+
             for i, page in enumerate(pages):
+
+
+
                 response = self.client.chat.completions.create(
                     model=self.model,
                     messages=[
@@ -66,11 +78,27 @@ class GPTProcessor:
                     ]
                 )
                 print(f"Finished alt text for page {i+1}")
-                alt_text.append(response.choices[0].message.content)
+
+                alt_text = response.choices[0].message.content.split("\n")
+                print("ALT TEXT AFTER SPLIT:")
+                print(alt_text)
+                alt_text = [json.loads(alt) for alt in alt_text if self._is_json(alt)]
+
+                for alt in alt_text:
+                    alt["altText"] = "AI-Generated Alt Text: " + alt["altText"]
+                alt_texts.extend(alt_text)
+
         except Exception as e:
             print(f"Error generating transcript: {e}")
             return None
-        return alt_text
+        return alt_texts
+    
+    def _is_json(self, myjson):
+        try:
+            json.loads(myjson)
+        except ValueError as e:
+            return False
+        return True
     
     def get_structured_md_incremental(self, pages):
         print("Starting incremental processing...")
