@@ -45,7 +45,8 @@ class GPTProcessor:
         where the name of the image or figure should go where <IMAGE_NAME> is and the alt text should go where <ALT_TEXT> is.
         2. Even if a figure or image has a caption, still generate an alt text description for it. Do not generate more than one alt text per image or figure.
         3. Do not include any image links or filepaths in the alt text.
-        4. Return no other text than the list of JSON objects.
+        4. If a figure or image is unnamed, replace the <IMAGE_NAME> with "Unlabeled Figure" followed by a short 3-5 word descriptive name for the figure.
+        5. Return no other text than the list of JSON objects.
 
         Example:
         {"imageName": "Figure 1.", "altText": "This is the alt text for figure 1"}\n
@@ -81,7 +82,7 @@ class GPTProcessor:
                 print("ALT TEXT AFTER SPLIT:")
                 print(alt_text)
                 alt_text = [json.loads(alt)
-                                       for alt in alt_text if self._is_json(alt)]
+                            for alt in alt_text if self._is_json(alt)]
 
                 for alt in alt_text:
                     alt["altText"] = "AI-Generated Alt Text: " + alt["altText"]
@@ -187,9 +188,8 @@ class GPTProcessor:
         # Combine all pages into a single markdown document
         print("Combining pages...")
         combined_markdown = "\n\n".join(structured_pages)
-        
+
         return combined_markdown
-        
 
     def get_images(self, file_path):
         print("Starting image extraction...")
@@ -220,7 +220,7 @@ class GPTProcessor:
         Requirements:
         1. Maintain logical reading order. If the text is in columns, transcribe the text from top to bottom, left to right in the columns. The columns may be broken by images.
         2. Maintain all image captions and references.
-        3. Maintain proper headings, subheadings, and hierarchies.
+        3. Enforce proper headings, subheadings, and hierarchies. If two pieces of text are the same size, they should have the same heading level.
         4. Do not include any footers, headers, page numbers, or other metadata.
         5. For any images in the page, generate a detailed alt text description for someone who is blind or low vision and include it directly following the caption.
         6. Do not include any actual image links or filepaths in the transcript.
@@ -229,28 +229,33 @@ class GPTProcessor:
         """
 
         USER_PROMPT = """
-        Transcribe this page of a document, maintaining proper headings, subheadings, and hierarchies.
+        Transcribe this document page, maintaining proper headings, subheadings, and hierarchies.
         Return no other text than the transcript.
         """
 
         try:
             transcript = ""
+            prev_message = []
+
             for i, page in enumerate(pages):
+                message = [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": [{"type": "text", "text": USER_PROMPT}, {
+                        "type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{page}"}}]}
+                ]
                 response = self.client.chat.completions.create(
                     model=self.model,
-                    messages=[
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": [{"type": "text", "text": USER_PROMPT}, {
-                            "type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{page}"}}]}
-                    ]
+                    messages=prev_message + message
                 )
+
+                prev_message = message
                 print(f"Finished transcribing page {i+1}")
                 transcript += response.choices[0].message.content
         except Exception as e:
             print(f"Error generating raw transcription: {e}")
             return None
         return transcript
-    
+
     def get_structured_md(self, raw_transcription, alt_text):
         print("Starting transcript structuring...")
 
@@ -278,10 +283,12 @@ class GPTProcessor:
                 model=self.model,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": [{"type": "text", "text": USER_PROMPT}]}
+                    {"role": "user", "content": [
+                        {"type": "text", "text": USER_PROMPT}]}
                 ]
             )
-            structured_transcript = response.choices[0].message.content.replace("```md", "").replace("```", "")
+            structured_transcript = response.choices[0].message.content.replace(
+                "```md", "").replace("```", "")
         except Exception as e:
             print(f"Error generating structured transcription  : {e}")
             return None
@@ -312,15 +319,17 @@ class GPTProcessor:
                 model=self.model,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": [{"type": "text", "text": USER_PROMPT}]}
+                    {"role": "user", "content": [
+                        {"type": "text", "text": USER_PROMPT}]}
                 ]
             )
-            structured_transcript = response.choices[0].message.content.replace("```html", "").replace("```", "")
+            structured_transcript = response.choices[0].message.content.replace(
+                "```html", "").replace("```", "")
         except Exception as e:
             print(f"Error generating structured transcription  : {e}")
             return None
         return structured_transcript
-    
+
     def convert_md_to_html(self, md_text):
         print("Starting markdown to HTML conversion...")
 
@@ -340,10 +349,12 @@ class GPTProcessor:
                 model=self.model,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": [{"type": "text", "text": USER_PROMPT}]}
+                    {"role": "user", "content": [
+                        {"type": "text", "text": USER_PROMPT}]}
                 ]
             )
-            html_text = response.choices[0].message.content.replace("```html", "").replace("```", "")
+            html_text = response.choices[0].message.content.replace(
+                "```html", "").replace("```", "")
         except Exception as e:
             print(f"Error converting markdown to HTML: {e}")
             return None
