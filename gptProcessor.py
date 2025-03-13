@@ -215,22 +215,37 @@ class GPTProcessor:
         You are a helpful assistant that can accurately and precisely extract text from images.
         You will be given a list of images that represent sequential pages of a document.
         Your task is to extract the text from each page and return it in a structured markdown format.
+        Base your output on the requirements and example below.
  
 
         Requirements:
         1. Maintain logical reading order. If the text is in columns, transcribe the text from top to bottom, left to right in the columns. The columns may be broken by images.
-        2. Maintain all image captions and references.
-        3. Enforce proper headings, subheadings, and hierarchies. If two pieces of text are the same size, they should have the same heading level.
-        4. Do not include any footers, headers, page numbers, or other metadata.
-        5. For any images in the page, generate a detailed alt text description for someone who is blind or low vision and include it directly following the caption.
-        6. Do not include any actual image links or filepaths in the transcript.
+        2. Maintain all image captions and references. Any image or figure captions should be the same heading level as the image name or label. Captions may be multiple sentences long. 
+        3. Unlabeled or untitled images should only be titled "Unlabeled Figure". Add no other text to the unlabeled figure.
+        4. Enforce proper headings, subheadings, and hierarchies. If two pieces of text are the same size, they should have the same heading level.
+        5. Ignore any text in the header, footer, or borders of the page. 
+        6. Return only text that is in the image.
         7. Return no other text than the transcript.
+
+        Example:
+
+        # <DOCUMENT_TITLE>
+        ## <DOCUMENT_SUBTITLE>
+
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+        ### <IMAGE_NAME>. <IMAGE_CAPTION>
+
+        ### Unlabeled Figure.
+
+        ## <SECTION TITLE>
 
         """
 
         USER_PROMPT = """
-        Transcribe this document page, maintaining proper headings, subheadings, and hierarchies.
+        Transcribe this document page, maintaining proper headings, subheadings, and hierarchies. Return only text that is in the image.
         Return no other text than the transcript.
+
         """
 
         try:
