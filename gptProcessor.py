@@ -243,7 +243,7 @@ class GPTProcessor:
         """
 
         USER_PROMPT = """
-        Transcribe this document page, maintaining proper headings, subheadings, and hierarchies. Return only text that is in the image.
+        Transcribe this document page, maintaining proper headings, subheadings, and hierarchies. Aside from naming unlabeled figures "Unlabeled Figure.", return only text that is present in the image.
         Return no other text than the transcript.
 
         """
