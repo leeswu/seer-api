@@ -6,13 +6,12 @@ from gptProcessor import GPTProcessor
 import dotenv
 import os
 import time
-from flask_cors import CORS
 
 os.makedirs("processed/md", exist_ok=True)
 os.makedirs("processed/html", exist_ok=True)
 
 app = Flask(__name__)
-CORS(app)
+
 # CSRF protection token
 app.config['SECRET_KEY'] = 'f1cacf64ffc7cb8983e52ba34cd39b09'
 app.config['PORT'] = 8000
