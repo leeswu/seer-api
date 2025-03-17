@@ -35,4 +35,4 @@ htmlcov/
 processed/html/*
 processed/md/*
 processed/images/*
-test_docs
+test_docs/*
