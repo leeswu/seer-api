@@ -1,6 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <title>Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
   </head>
   <body>
@@ -25,13 +28,147 @@
         {% endwith %}
       </div>
 
+      <!-- Processing Status for Screen Readers -->
+      <div role="status" id="processing-announcement" class="sr-only" aria-live="polite"></div>
+
       <!-- Upload Form -->
-      <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+      <form id="upload-form" method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="form-group">{{ form.file.label() }} {{ form.file() }}</div>
         <div class="form-group">{{ form.submit() }}</div>
       </form>
+
+      <!-- Processing Indicator (initially hidden) -->
+      <div id="processing-indicator" style="display: none;">
+        <div class="spinner"></div>
+        <p>Processing your file... <span id="progress">0%</span></p>
+      </div>
+
+      <!-- Result Container (initially hidden) -->
+      <div id="result-container" style="display: none;">
+        <h2>Processing Complete</h2>
+        <p>Your file has been converted. <a href="#" id="download-link">Download</a> or <a href="#" id="view-link">View</a> your accessible document.</p>
+      </div>
     </div>
 
+    <!-- Audio Feedback Script -->
+    <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    
+    <!-- Form Processing Script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('upload-form');
+        const processingIndicator = document.getElementById('processing-indicator');
+        const resultContainer = document.getElementById('result-container');
+        
+        // Only add this JavaScript functionality if we're using the form for AJAX uploads
+        if (form) {
+          form.addEventListener('submit', function(e) {
+            // Only intercept for AJAX if the action is streamlit-upload
+            if (form.getAttribute('action') === "{{ url_for('streamlit_upload') }}") {
+              e.preventDefault();
+              
+              const formData = new FormData(form);
+              
+              // Display processing indicator
+              form.style.display = 'none';
+              processingIndicator.style.display = 'block';
+              
+              // Start the processing sound
+              startProcessingSound();
+              
+              // Simulate progress updates
+              let progress = 0;
+              const progressElement = document.getElementById('progress');
+              const progressInterval = setInterval(() => {
+                progress += 5;
+                if (progress > 95) {
+                  clearInterval(progressInterval);
+                }
+                progressElement.textContent = `${progress}%`;
+              }, 1000);
+              
+              // Send the form data
+              fetch("{{ url_for('streamlit_upload') }}", {
+                method: 'POST',
+                body: formData
+              })
+              .then(response => response.json())
+              .then(data => {
+                // Clear progress interval
+                clearInterval(progressInterval);
+                
+                // Stop processing sound and play completion sound
+                stopProcessingSound();
+                playCompletionSound();
+                
+                // Hide processing indicator
+                processingIndicator.style.display = 'none';
+                
+                if (data.error) {
+                  alert(`Error: ${data.error}`);
+                  form.style.display = 'block';
+                  return;
+                }
+                
+                // Create blob for download
+                const htmlBlob = new Blob([data.html], {type: 'text/html'});
+                const htmlUrl = URL.createObjectURL(htmlBlob);
+                
+                // Set download link
+                const downloadLink = document.getElementById('download-link');
+                downloadLink.href = htmlUrl;
+                downloadLink.download = `${data.filename.replace('.pdf', '')}-accessible.html`;
+                
+                // Set view link
+                const viewLink = document.getElementById('view-link');
+                viewLink.href = htmlUrl;
+                viewLink.target = '_blank';
+                
+                // Display result container
+                resultContainer.style.display = 'block';
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing your file. Please try again.');
+                form.style.display = 'block';
+                processingIndicator.style.display = 'none';
+                stopProcessingSound();
+              });
+            }
+          });
+        }
+      });
+    </script>
+
+    <!-- Add CSS for screen reader only elements and spinner -->
+    <style>
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+      
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 2s linear infinite;
+        margin: 0 auto;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
   </body>
 </html>
